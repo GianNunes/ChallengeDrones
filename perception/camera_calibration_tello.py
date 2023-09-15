@@ -1,9 +1,11 @@
 import cv2
-import tello
+from djitellopy import Tello
 import time
 import numpy as np
 
-drone = tello.Tello('', 8889)
+drone = Tello()
+drone.connect()
+drone.streamon()
 time.sleep(10)
 chase_count = 0
 chase_image_list = []
@@ -13,7 +15,7 @@ objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 while(True):
-    frame = drone.read()
+    frame = drone.get_frame_read().frame
     imageSize = (frame.shape[0], frame.shape[1])
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -32,7 +34,7 @@ while(True):
 
     cv2.imshow('frame', frame)
     key = cv2.waitKey(33)
-    drone.keyboard(key)
+    # drone.keyboard(key)
     
 f = cv2.FileStorage('calibration.xml', cv2.FILE_STORAGE_WRITE)
 f.write("intrinsic", cameraMatrix)
